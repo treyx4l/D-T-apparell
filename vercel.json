@@ -1,75 +1,34 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "css/**",
-      "use": "@vercel/static"
+  "functions": {
+    "api/*.php": {
+      "runtime": "vercel-php@0.7.3"
     },
-    {
-      "src": "js/**",
-      "use": "@vercel/static"
+    "auth/*.php": {
+      "runtime": "vercel-php@0.7.3"
     },
-    {
-      "src": "assets/**",
-      "use": "@vercel/static"
+    "dt-admin/*.php": {
+      "runtime": "vercel-php@0.7.3"
     },
-    {
-      "src": "*.php",
-      "use": "vercel-php@0.7.3"
-    },
-    {
-      "src": "auth/*.php",
-      "use": "vercel-php@0.7.3"
-    },
-    {
-      "src": "dt-admin/*.php",
-      "use": "vercel-php@0.7.3"
-    },
-    {
-      "src": "api/*.php",
-      "use": "vercel-php@0.7.3"
+    "*.php": {
+      "runtime": "vercel-php@0.7.3"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/css/(.*)",
-      "dest": "/css/$1"
+      "source": "/store",
+      "destination": "/store.php"
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/js/$1"
+      "source": "/dt-admin",
+      "destination": "/dt-admin/index.php"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "source": "/dt-admin/",
+      "destination": "/dt-admin/index.php"
     },
     {
-      "src": "/dt-admin/(.*)",
-      "dest": "/dt-admin/$1"
-    },
-    {
-      "src": "/auth/(.*)",
-      "dest": "/auth/$1"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/store",
-      "dest": "/store.php"
-    },
-    {
-      "src": "/store.php",
-      "dest": "/store.php"
-    },
-    {
-      "src": "/index.php",
-      "dest": "/index.php"
-    },
-    {
-      "src": "/",
-      "dest": "/index.php"
+      "source": "/",
+      "destination": "/index.php"
     }
   ]
 }
