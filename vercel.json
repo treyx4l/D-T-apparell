@@ -2,33 +2,24 @@
   "functions": {
     "api/*.php": {
       "runtime": "vercel-php@0.7.3"
-    },
-    "auth/*.php": {
-      "runtime": "vercel-php@0.7.3"
-    },
-    "dt-admin/*.php": {
-      "runtime": "vercel-php@0.7.3"
-    },
-    "*.php": {
-      "runtime": "vercel-php@0.7.3"
     }
   },
   "rewrites": [
     {
-      "source": "/store",
-      "destination": "/store.php"
+      "source": "/css/(.*)",
+      "destination": "/css/$1"
     },
     {
-      "source": "/dt-admin",
-      "destination": "/dt-admin/index.php"
+      "source": "/js/(.*)",
+      "destination": "/js/$1"
     },
     {
-      "source": "/dt-admin/",
-      "destination": "/dt-admin/index.php"
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
     },
     {
-      "source": "/",
-      "destination": "/index.php"
+      "source": "/(.*)",
+      "destination": "/api/index.php"
     }
   ]
 }
