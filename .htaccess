@@ -1,0 +1,32 @@
+# Block sensitive directories and files
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Deny access to includes, vendor, supabase SQL, and env files
+  RewriteRule ^includes/ - [F,L]
+  RewriteRule ^vendor/ - [F,L]
+  RewriteRule ^supabase/ - [F,L]
+  RewriteRule ^\.env - [F,L]
+
+  # Redirect legacy HTML routes to PHP
+  RewriteRule ^index\.html$ index.php [R=301,L]
+  RewriteRule ^store\.html$ store.php [R=301,L]
+  RewriteRule ^admin-login\.html$ dt-admin/ [R=301,L]
+  RewriteRule ^dashboard\.html$ dt-admin/dashboard.php [R=301,L]
+  RewriteRule ^orders\.html$ dt-admin/orders.php [R=301,L]
+</IfModule>
+
+# Security headers (fallback if PHP headers not sent)
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "DENY"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Disable directory listing
+Options -Indexes
+
+# Protect dotfiles
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
