@@ -49,10 +49,10 @@ require __DIR__ . '/../../includes/admin-header.php';
     <button type="button" onclick="addProduct()" class="btn-primary mt-6"><i class="fas fa-plus"></i> Add Product</button>
   </div>
 
-  <div class="text-center">
-    <button type="button" onclick="openProductsModal()" class="btn-secondary">
-      <i class="fas fa-list"></i> View All Products (<span id="productCount">0</span>)
-    </button>
+  <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+    <a href="<?= url(ADMIN_PATH . '/products.php') ?>" class="btn-secondary flex items-center gap-2 py-3 px-6 text-sm">
+      <i class="fas fa-boxes text-accent"></i> View Inventory / All Products (<span id="productCount">0</span>)
+    </a>
   </div>
 </section>
 

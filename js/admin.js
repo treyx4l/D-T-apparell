@@ -198,75 +198,141 @@
     }
   };
 
+  let rawProducts = [];
+  let currentStockFilter = 'all';
+  let currentSearchQuery = '';
+
   function stockBadge(product) {
     if (product.sold_out || product.quantity <= 0) {
-      return '<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Sold Out</span>';
+      return '<span class="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950 dark:text-red-300">Sold Out</span>';
     }
-    return `<span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">${product.quantity} in stock</span>`;
+    return `<span class="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 dark:bg-green-950 dark:text-green-300">${product.quantity} in stock</span>`;
+  }
+
+  function getFilteredProducts() {
+    return rawProducts.filter((p) => {
+      const isSoldOut = p.sold_out || p.quantity <= 0;
+      if (currentStockFilter === 'instock' && isSoldOut) return false;
+      if (currentStockFilter === 'soldout' && !isSoldOut) return false;
+
+      if (currentSearchQuery) {
+        const q = currentSearchQuery.toLowerCase();
+        const nameMatch = (p.name || '').toLowerCase().includes(q);
+        const catMatch = (p.category || '').toLowerCase().includes(q);
+        if (!nameMatch && !catMatch) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderInventoryList() {
+    const inventoryList = document.getElementById('inventoryList');
+    const productsList = document.getElementById('productsList');
+    const filtered = getFilteredProducts();
+
+    const showingCountEl = document.getElementById('showingItemsCount');
+    if (showingCountEl) showingCountEl.textContent = filtered.length;
+
+    const html = filtered.length === 0
+      ? '<div class="py-12 text-center text-sm text-muted">No products found matching your search.</div>'
+      : filtered.map((p) => {
+          const soldOut = p.sold_out || p.quantity <= 0;
+          const safeName = escapeHtml(p.name).replace(/'/g, "\\'");
+          const imgUrl = escapeHtml(typeof normalizeStorageUrl === 'function' ? normalizeStorageUrl(p.image) : p.image);
+          return `
+          <div class="flex items-center gap-3 p-2.5 sm:p-3 hover:bg-gray-50/80 dark:hover:bg-gray-800/40 transition-colors">
+            <img src="${imgUrl}" alt="${safeName}" class="h-12 w-12 sm:h-14 sm:w-14 rounded-lg object-cover bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 flex-shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="font-medium text-xs sm:text-sm text-ink dark:text-white truncate">${escapeHtml(p.name)}</h4>
+              <div class="mt-1 flex flex-wrap items-center gap-1.5">
+                <span class="text-xs sm:text-sm font-bold text-accent">₵${Number(p.price).toFixed(2)}</span>
+                ${stockBadge(p)}
+                <span class="text-[10px] text-muted hidden sm:inline">• ${escapeHtml(p.category)}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button type="button" class="h-8 w-8 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-ink dark:text-white flex items-center justify-center text-xs transition" title="Edit Product" onclick="editProduct('${p.id}')">
+                <i class="fas fa-pen"></i>
+              </button>
+              <button type="button" class="h-8 w-8 rounded-lg text-xs flex items-center justify-center transition ${soldOut ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950 dark:text-red-300' : 'opacity-30 cursor-not-allowed text-gray-400 dark:text-gray-600'}"
+                ${soldOut ? `onclick="deleteProduct('${p.id}', '${safeName}', true, '${escapeHtml(p.image)}')"` : 'disabled title="Only sold-out items can be deleted"'}>
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>`;
+        }).join('');
+
+    if (inventoryList) inventoryList.innerHTML = html;
+    if (productsList) productsList.innerHTML = html;
   }
 
   async function renderProducts() {
-    const productsList = document.getElementById('productsList');
-    if (!productsList) return;
-
     const client = await getAuthenticatedClient();
     const { data, error } = await client.from('products').select('*').order('created_at', { ascending: false });
 
     if (error) {
-      productsList.innerHTML = '<p class="col-span-full text-center text-red-500">Failed to load products.</p>';
+      const errHtml = '<p class="col-span-full py-8 text-center text-red-500 text-sm">Failed to load products.</p>';
+      const invList = document.getElementById('inventoryList');
+      const prodList = document.getElementById('productsList');
+      if (invList) invList.innerHTML = errHtml;
+      if (prodList) prodList.innerHTML = errHtml;
       return;
     }
 
-    const products = (data || []).map((p) => typeof normalizeProductImage === 'function' ? normalizeProductImage({ ...p }) : p);
-    document.getElementById('productCount').textContent = products.length;
-    document.getElementById('modalProductCount').textContent = products.length;
+    rawProducts = (data || []).map((p) => typeof normalizeProductImage === 'function' ? normalizeProductImage({ ...p }) : p);
 
-    if (products.length === 0) {
-      productsList.innerHTML = '<p class="col-span-full py-12 text-center text-muted">No products yet.</p>';
-      return;
-    }
+    const countEls = ['productCount', 'modalProductCount', 'totalItemsCount', 'showingItemsCount'];
+    countEls.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = rawProducts.length;
+    });
 
-    productsList.innerHTML = products.map((p) => {
-      const soldOut = p.sold_out || p.quantity <= 0;
-      const safeName = escapeHtml(p.name).replace(/'/g, "\\'");
-      const imgUrl = escapeHtml(typeof normalizeStorageUrl === 'function' ? normalizeStorageUrl(p.image) : p.image);
-      return `
-      <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <img src="${imgUrl}" alt="${safeName}" class="h-16 w-16 sm:h-20 sm:w-20 rounded-xl object-cover border border-gray-100 dark:border-gray-800 flex-shrink-0">
-        <div class="min-w-0 flex-1">
-          <div class="flex flex-wrap items-center gap-1.5 mb-1">
-            <span class="product-category-badge text-[10px] px-2 py-0.5">${escapeHtml(p.category)}</span>
-            ${stockBadge(p)}
-          </div>
-          <h4 class="font-semibold text-sm sm:text-base text-ink dark:text-white truncate">${escapeHtml(p.name)}</h4>
-          <p class="text-sm font-bold text-ink dark:text-accent">₵${Number(p.price).toFixed(2)}</p>
-        </div>
-        <div class="flex flex-col sm:flex-row gap-1.5 flex-shrink-0">
-          <button type="button" class="btn-primary text-xs py-1.5 px-3 flex items-center justify-center gap-1" onclick="editProduct('${p.id}')">
-            <i class="fas fa-edit text-xs"></i><span>Edit</span>
-          </button>
-          <button type="button" class="rounded-xl py-1.5 px-3 text-xs font-semibold text-white flex items-center justify-center gap-1 ${soldOut ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'}"
-            ${soldOut ? `onclick="deleteProduct('${p.id}', '${safeName}', true, '${escapeHtml(p.image)}')"` : 'disabled title="Only sold-out items can be deleted"'}>
-            <i class="fas fa-trash text-xs"></i><span>${soldOut ? 'Delete' : 'Locked'}</span>
-          </button>
-        </div>
-      </div>`;
-    }).join('');
+    renderInventoryList();
   }
 
+  window.handleInventorySearch = function handleInventorySearch() {
+    const input = document.getElementById('inventorySearch');
+    const clearBtn = document.getElementById('clearInvSearch');
+    currentSearchQuery = (input?.value || '').trim();
+    if (clearBtn) {
+      clearBtn.classList.toggle('hidden', currentSearchQuery === '');
+    }
+    renderInventoryList();
+  };
+
+  window.clearInventorySearch = function clearInventorySearch() {
+    const input = document.getElementById('inventorySearch');
+    const clearBtn = document.getElementById('clearInvSearch');
+    if (input) input.value = '';
+    if (clearBtn) clearBtn.classList.add('hidden');
+    currentSearchQuery = '';
+    renderInventoryList();
+  };
+
+  window.filterInventoryByStock = function filterInventoryByStock(filter, e) {
+    currentStockFilter = filter;
+    document.querySelectorAll('[data-stock-filter]').forEach((btn) => {
+      btn.classList.remove('filter-pill-active');
+    });
+    if (e?.target) {
+      e.target.classList.add('filter-pill-active');
+    }
+    renderInventoryList();
+  };
+
   window.openProductsModal = function openProductsModal() {
-    document.getElementById('productsModal').classList.add('active');
+    document.getElementById('productsModal')?.classList.add('active');
     document.body.style.overflow = 'hidden';
     renderProducts();
   };
 
   window.closeProductsModal = function closeProductsModal() {
-    document.getElementById('productsModal').classList.remove('active');
+    document.getElementById('productsModal')?.classList.remove('active');
     document.body.style.overflow = '';
   };
 
   window.closeEditModal = function closeEditModal() {
-    document.getElementById('editProductModal').classList.remove('active');
+    document.getElementById('editProductModal')?.classList.remove('active');
     document.body.style.overflow = '';
     editingProductId = null;
     editingImagePath = null;

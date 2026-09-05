@@ -40,8 +40,11 @@ $activeAdminNav = $activeAdminNav ?? '';
         <span class="font-semibold">D&T Admin</span>
       </a>
       <div class="flex items-center gap-2 sm:gap-4">
-        <a href="<?= url(ADMIN_PATH . '/dashboard.php') ?>" class="nav-link <?= $activeAdminNav === 'products' ? 'nav-link-active' : '' ?>">
-          <i class="fas fa-box"></i><span class="hidden sm:inline ml-2">Products</span>
+        <a href="<?= url(ADMIN_PATH . '/products.php') ?>" class="nav-link <?= $activeAdminNav === 'inventory' ? 'nav-link-active' : '' ?>">
+          <i class="fas fa-boxes"></i><span class="hidden sm:inline ml-2">Inventory</span>
+        </a>
+        <a href="<?= url(ADMIN_PATH . '/dashboard.php') ?>" class="nav-link <?= $activeAdminNav === 'add-product' ? 'nav-link-active' : '' ?>">
+          <i class="fas fa-plus-circle"></i><span class="hidden sm:inline ml-2">Add Product</span>
         </a>
         <a href="<?= url(ADMIN_PATH . '/orders.php') ?>" class="nav-link <?= $activeAdminNav === 'orders' ? 'nav-link-active' : '' ?>">
           <i class="fas fa-shopping-cart"></i><span class="hidden sm:inline ml-2">Orders</span>
