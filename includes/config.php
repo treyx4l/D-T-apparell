@@ -87,7 +87,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'domain' => '',
         'secure' => isProduction(),
         'httponly' => true,
-        'samesite' => 'Strict',
+        'samesite' => 'Lax',
     ]);
 
     session_start();

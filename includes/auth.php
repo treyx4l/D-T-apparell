@@ -38,6 +38,76 @@ function is_admin(): bool
     return current_user_role() === 'admin';
 }
 
+function get_auth_cookie_name(): string
+{
+    return 'dt_apparels_auth_payload';
+}
+
+function save_auth_cookie(array $user, string $accessToken, string $refreshToken): void
+{
+    $payload = json_encode([
+        'id' => $user['id'] ?? '',
+        'email' => $user['email'] ?? '',
+        'name' => $user['user_metadata']['full_name'] ?? $user['user_metadata']['name'] ?? ($user['email'] ?? ''),
+        'role' => $user['user_metadata']['role'] ?? ($user['role'] ?? 'customer'),
+        'access_token' => $accessToken,
+        'refresh_token' => $refreshToken,
+        'time' => time(),
+    ]);
+
+    $secret = $_ENV['SESSION_SECRET'] ?? 'dt-apparels-secret-key-2026';
+    $sig = hash_hmac('sha256', $payload, $secret);
+    $cookieValue = base64_encode($payload) . '.' . $sig;
+
+    setcookie(get_auth_cookie_name(), $cookieValue, [
+        'expires' => time() + (30 * 86400),
+        'path' => '/',
+        'domain' => '',
+        'secure' => isProduction(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+function read_auth_cookie(): ?array
+{
+    if (empty($_COOKIE[get_auth_cookie_name()])) {
+        return null;
+    }
+
+    $parts = explode('.', $_COOKIE[get_auth_cookie_name()], 2);
+    if (count($parts) !== 2) {
+        return null;
+    }
+
+    [$encoded, $sig] = $parts;
+    $payload = base64_decode($encoded, true);
+    if (!is_string($payload)) {
+        return null;
+    }
+
+    $secret = $_ENV['SESSION_SECRET'] ?? 'dt-apparels-secret-key-2026';
+    $expectedSig = hash_hmac('sha256', $payload, $secret);
+    if (!hash_equals($expectedSig, $sig)) {
+        return null;
+    }
+
+    $data = json_decode($payload, true);
+    return is_array($data) ? $data : null;
+}
+
+function clear_auth_cookie(): void
+{
+    setcookie(get_auth_cookie_name(), '', [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'domain' => '',
+        'secure' => isProduction(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
 function set_auth_session(array $user, string $accessToken, string $refreshToken): void
 {
     session_regenerate_id(true);
@@ -51,12 +121,14 @@ function set_auth_session(array $user, string $accessToken, string $refreshToken
     $_SESSION['access_token'] = $accessToken;
     $_SESSION['refresh_token'] = $refreshToken;
 
+    save_auth_cookie($user, $accessToken, $refreshToken);
     regenerate_csrf_token();
 }
 
 function clear_auth_session(): void
 {
     $_SESSION = [];
+    clear_auth_cookie();
 
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
@@ -143,6 +215,18 @@ function verify_supabase_token(string $accessToken): ?array
 
 function refresh_session_if_needed(): bool
 {
+    if (empty($_SESSION['access_token'])) {
+        $cookieData = read_auth_cookie();
+        if ($cookieData !== null && !empty($cookieData['access_token'])) {
+            $_SESSION['user_id'] = $cookieData['id'] ?? '';
+            $_SESSION['user_email'] = $cookieData['email'] ?? '';
+            $_SESSION['user_name'] = $cookieData['name'] ?? '';
+            $_SESSION['user_role'] = $cookieData['role'] ?? 'customer';
+            $_SESSION['access_token'] = $cookieData['access_token'] ?? '';
+            $_SESSION['refresh_token'] = $cookieData['refresh_token'] ?? '';
+        }
+    }
+
     if (empty($_SESSION['access_token'])) {
         return false;
     }
