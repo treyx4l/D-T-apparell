@@ -57,13 +57,13 @@ require __DIR__ . '/../../includes/admin-header.php';
 </section>
 
 <div id="productsModal" class="modal-backdrop">
-  <div class="modal-panel max-w-5xl">
+  <div class="modal-panel max-w-3xl">
     <div class="flex items-center justify-between border-b border-gray-100 p-4 dark:border-gray-800">
       <h3 class="font-semibold">All Products (<span id="modalProductCount">0</span>)</h3>
       <button type="button" onclick="closeProductsModal()" class="icon-btn"><i class="fas fa-times"></i></button>
     </div>
-    <div class="max-h-[70vh] overflow-y-auto p-4">
-      <div id="productsList" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+    <div class="max-h-[75vh] overflow-y-auto p-3 sm:p-4">
+      <div id="productsList" class="space-y-3"></div>
     </div>
   </div>
 </div>

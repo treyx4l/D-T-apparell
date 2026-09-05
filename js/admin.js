@@ -229,24 +229,26 @@
     productsList.innerHTML = products.map((p) => {
       const soldOut = p.sold_out || p.quantity <= 0;
       const safeName = escapeHtml(p.name).replace(/'/g, "\\'");
+      const imgUrl = escapeHtml(typeof normalizeStorageUrl === 'function' ? normalizeStorageUrl(p.image) : p.image);
       return `
-      <div class="product-card">
-        <img src="${escapeHtml(typeof normalizeStorageUrl === 'function' ? normalizeStorageUrl(p.image) : p.image)}" alt="" class="product-card-image">
-        <div class="product-card-body">
-          <div class="mb-2 flex items-center justify-between gap-2">
-            <span class="product-category-badge">${escapeHtml(p.category)}</span>
+      <div class="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+        <img src="${imgUrl}" alt="${safeName}" class="h-16 w-16 sm:h-20 sm:w-20 rounded-xl object-cover border border-gray-100 dark:border-gray-800 flex-shrink-0">
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-1.5 mb-1">
+            <span class="product-category-badge text-[10px] px-2 py-0.5">${escapeHtml(p.category)}</span>
             ${stockBadge(p)}
           </div>
-          <h3 class="font-semibold">${escapeHtml(p.name)}</h3>
-          <p class="font-bold">₵${Number(p.price).toFixed(2)}</p>
-          <p class="mt-1 line-clamp-2 text-xs text-muted">${escapeHtml(p.description || '')}</p>
-          <div class="mt-3 flex gap-2">
-            <button type="button" class="btn-primary flex-1 text-xs py-2" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i> Edit</button>
-            <button type="button" class="flex-1 rounded-xl py-2 text-xs font-semibold text-white ${soldOut ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-300 cursor-not-allowed'}"
-              ${soldOut ? `onclick="deleteProduct('${p.id}', '${safeName}', true, '${escapeHtml(p.image)}')"` : 'disabled title="Only sold-out items can be deleted"'}>
-              <i class="fas fa-trash"></i> ${soldOut ? 'Delete' : 'Locked'}
-            </button>
-          </div>
+          <h4 class="font-semibold text-sm sm:text-base text-ink dark:text-white truncate">${escapeHtml(p.name)}</h4>
+          <p class="text-sm font-bold text-ink dark:text-accent">₵${Number(p.price).toFixed(2)}</p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-1.5 flex-shrink-0">
+          <button type="button" class="btn-primary text-xs py-1.5 px-3 flex items-center justify-center gap-1" onclick="editProduct('${p.id}')">
+            <i class="fas fa-edit text-xs"></i><span>Edit</span>
+          </button>
+          <button type="button" class="rounded-xl py-1.5 px-3 text-xs font-semibold text-white flex items-center justify-center gap-1 ${soldOut ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-200 text-gray-400 dark:bg-gray-800 dark:text-gray-600 cursor-not-allowed'}"
+            ${soldOut ? `onclick="deleteProduct('${p.id}', '${safeName}', true, '${escapeHtml(p.image)}')"` : 'disabled title="Only sold-out items can be deleted"'}>
+            <i class="fas fa-trash text-xs"></i><span>${soldOut ? 'Delete' : 'Locked'}</span>
+          </button>
         </div>
       </div>`;
     }).join('');
