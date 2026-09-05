@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../../includes/config.php';
 
 $pageTitle = 'Signing in... — ' . APP_NAME;
 $next = sanitize_input($_GET['next'] ?? '/index.php');
@@ -12,7 +12,7 @@ if (!str_starts_with($next, '/')) {
 $checkEmailUrl = url('auth/check-email.php');
 $extraScripts = ['js/auth-callback.js'];
 
-require __DIR__ . '/../includes/header.php';
+require __DIR__ . '/../../includes/header.php';
 ?>
 
 <section class="flex min-h-[50vh] items-center justify-center px-4 py-16">
@@ -34,4 +34,4 @@ window.DT_CALLBACK = <?= json_encode([
 ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 </script>
 
-<?php require __DIR__ . '/../includes/footer.php'; ?>
+<?php require __DIR__ . '/../../includes/footer.php'; ?>

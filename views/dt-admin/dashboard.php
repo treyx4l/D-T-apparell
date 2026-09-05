@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../../includes/config.php';
 
 require_admin();
 $pageTitle = 'Products — Admin';
 $activeAdminNav = 'products';
-$categories = require __DIR__ . '/../includes/constants.php';
+$categories = require __DIR__ . '/../../includes/constants.php';
 $extraScripts = ['js/admin.js'];
 
-require __DIR__ . '/../includes/admin-header.php';
+require __DIR__ . '/../../includes/admin-header.php';
 ?>
 
 <section class="border-b border-gray-200 bg-white py-10 dark:border-gray-800 dark:bg-gray-900">
@@ -103,4 +103,4 @@ require __DIR__ . '/../includes/admin-header.php';
   </div>
 </div>
 
-<?php require __DIR__ . '/../includes/admin-footer.php'; ?>
+<?php require __DIR__ . '/../../includes/admin-footer.php'; ?>

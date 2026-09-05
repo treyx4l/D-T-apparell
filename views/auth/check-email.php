@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../../includes/config.php';
 
 $email = sanitize_email($_GET['email'] ?? '');
 $pageTitle = 'Verify Your Email — ' . APP_NAME;
 $activeNav = 'login';
 $extraScripts = ['js/auth.js'];
 
-require __DIR__ . '/../includes/header.php';
+require __DIR__ . '/../../includes/header.php';
 ?>
 
 <section class="flex min-h-[70vh] items-center justify-center px-4 py-16">
@@ -64,4 +64,4 @@ require __DIR__ . '/../includes/header.php';
 })();
 </script>
 
-<?php require __DIR__ . '/../includes/footer.php'; ?>
+<?php require __DIR__ . '/../../includes/footer.php'; ?>

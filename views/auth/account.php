@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../../includes/config.php';
 
 require_customer_auth();
 $pageTitle = 'My Account — ' . APP_NAME;
 $activeNav = 'account';
 
-require __DIR__ . '/../includes/header.php';
+require __DIR__ . '/../../includes/header.php';
 ?>
 
 <section class="mx-auto max-w-2xl px-4 py-16 sm:px-6">
@@ -35,4 +35,4 @@ require __DIR__ . '/../includes/header.php';
   </div>
 </section>
 
-<?php require __DIR__ . '/../includes/footer.php'; ?>
+<?php require __DIR__ . '/../../includes/footer.php'; ?>
