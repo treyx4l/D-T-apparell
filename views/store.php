@@ -113,9 +113,8 @@ require __DIR__ . '/../includes/header.php';
         </div>
       </div>
       <form id="checkoutForm" class="space-y-4">
-        <input type="hidden" name="csrf_token" value="<?= escape_output(csrf_token()) ?>">
         <div><label class="label-field">Full Name *</label><input type="text" id="customerName" class="input-field" required maxlength="100"></div>
-        <div><label class="label-field">Email *</label><input type="email" id="customerEmail" class="input-field" required maxlength="150" value="<?= escape_output($_SESSION['user_email'] ?? '') ?>"></div>
+        <div><label class="label-field">Email *</label><input type="email" id="customerEmail" class="input-field" required maxlength="150"></div>
         <div><label class="label-field">Phone *</label><input type="tel" id="customerPhone" class="input-field" required maxlength="20"></div>
         <div>
           <label class="label-field">Region *</label>

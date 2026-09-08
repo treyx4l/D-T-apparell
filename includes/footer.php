@@ -7,7 +7,6 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="<?= asset('js/supabase-client.js') ?>"></script>
-  <script src="<?= asset('js/auth-channel.js') ?>"></script>
   <script src="<?= asset('js/theme.js') ?>"></script>
   <?php if (!empty($extraScripts)): ?>
     <?php foreach ($extraScripts as $script): ?>

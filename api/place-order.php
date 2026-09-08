@@ -20,13 +20,6 @@ try {
         $data = $_POST;
     }
 
-    $csrfToken = is_string($data['csrf_token'] ?? null) ? $data['csrf_token'] : ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null);
-    if (!verify_csrf($csrfToken)) {
-        // If session token is not matched or expired, regenerate a new one so retry works
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error' => 'Invalid session or CSRF token. Please try again.']);
-        exit;
-    }
 
     $customerName = trim((string)($data['customer_name'] ?? ''));
     $email        = trim((string)($data['email'] ?? ''));
@@ -80,7 +73,7 @@ try {
     }
 
     $orderData = [
-        'user_id'       => !empty($_SESSION['user_id']) ? $_SESSION['user_id'] : null,
+        'user_id'       => null,
         'customer_name' => substr($customerName, 0, 100),
         'email'         => substr($email, 0, 150),
         'phone'         => substr($phone, 0, 20),

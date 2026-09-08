@@ -309,9 +309,7 @@
     e.preventDefault();
     if (cart.length === 0) { showToast('Your cart is empty!', 'error'); return; }
 
-    const csrfToken = document.querySelector('#checkoutForm input[name="csrf_token"]')?.value;
     const orderData = {
-      user_id: (config.userId && typeof config.userId === 'string' && config.userId.length > 20) ? config.userId : null,
       customer_name: document.getElementById('customerName').value.trim().slice(0, 100),
       email: document.getElementById('customerEmail').value.trim().slice(0, 150),
       phone: document.getElementById('customerPhone').value.trim().slice(0, 20),
@@ -344,10 +342,8 @@
         credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken || config.csrfToken || '',
         },
         body: JSON.stringify({
-          csrf_token: csrfToken || config.csrfToken || '',
           customer_name: orderData.customer_name,
           email: orderData.email,
           phone: orderData.phone,

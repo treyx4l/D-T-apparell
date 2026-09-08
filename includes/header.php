@@ -26,9 +26,6 @@ $activeNav = $activeNav ?? '';
         'supabase' => supabase_public_config(),
         'whatsappNumber' => WHATSAPP_NUMBER,
         'storageBucket' => STORAGE_BUCKET,
-        'isLoggedIn' => is_logged_in(),
-        'userId' => $_SESSION['user_id'] ?? null,
-        'userEmail' => $_SESSION['user_email'] ?? '',
     ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
   </script>
   <?php require __DIR__ . '/oauth-recovery.php'; ?>
@@ -44,18 +41,7 @@ $activeNav = $activeNav ?? '';
         <a href="<?= url('store.php') ?>" class="nav-link <?= $activeNav === 'store' ? 'nav-link-active' : '' ?>">
           <i class="fas fa-store"></i><span class="hidden sm:inline ml-2">Store</span>
         </a>
-        <?php if (is_logged_in()): ?>
-          <a href="<?= url('auth/account.php') ?>" class="nav-link <?= $activeNav === 'account' ? 'nav-link-active' : '' ?>">
-            <i class="fas fa-user"></i><span class="hidden sm:inline ml-2">Account</span>
-          </a>
-          <a href="<?= url('auth/logout.php') ?>" class="nav-link">
-            <i class="fas fa-sign-out-alt"></i><span class="hidden sm:inline ml-2">Sign Out</span>
-          </a>
-        <?php else: ?>
-          <a href="<?= url('auth/login.php') ?>" class="nav-link <?= $activeNav === 'login' ? 'nav-link-active' : '' ?>">
-            <i class="fas fa-sign-in-alt"></i><span class="hidden sm:inline ml-2">Sign In</span>
-          </a>
-        <?php endif; ?>
+
         <button type="button" onclick="toggleTheme()" class="icon-btn" aria-label="Toggle theme">
           <i class="fas fa-moon dark:hidden"></i>
           <i class="fas fa-sun hidden dark:inline"></i>
